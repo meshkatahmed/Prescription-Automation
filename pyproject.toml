@@ -1,0 +1,27 @@
+[project]
+name = "prescription-automation"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Meshkat Uddin Ahammed",email = "meshkatuddinahammed@outlook.com"}
+]
+requires-python = ">=3.14"
+dependencies = [
+    "google-genai (>=2.7.0,<3.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)"
+]
+
+packages = [
+    { include = "prescription_automation" }
+]
+
+include = [
+    { path = "prescription_automation/prompts/extraction_prompt.txt", format = "text" }
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

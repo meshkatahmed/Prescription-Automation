@@ -1,0 +1,6 @@
+.venv
+.pytest_cache
+.env
+
+prescription_automation/__pycache__
+tests/__pycache__
