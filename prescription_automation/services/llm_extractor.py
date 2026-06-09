@@ -9,6 +9,7 @@ from ..schemas import (
     SymptomEntry,
 )
 from ..prompts import render_extraction_prompt
+from ..utils.transcript_utils import normalize_transcript
 
 
 _SCHEMA_MODELS = [
@@ -29,8 +30,9 @@ class LLMExtractor:
         else:
             self.client = genai.Client()
 
-    def extract(self, raw_transcript: str) -> ExtractionResult:
-        prompt = render_extraction_prompt(raw_transcript)
+    def extract(self, transcript: str) -> ExtractionResult:
+        normalized_transcript = normalize_transcript(transcript)
+        prompt = render_extraction_prompt(normalized_transcript)
 
         response = self.client.models.generate_content(
             model=self.model_name,
@@ -51,5 +53,4 @@ class LLMExtractor:
         else:
             parsed_data = ExtractionResult.model_validate_json(response.text)
 
-        parsed_data.raw_transcript = raw_transcript
         return parsed_data

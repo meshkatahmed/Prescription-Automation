@@ -49,7 +49,7 @@ class PatientInfo(BaseModel):
 
 
 class ExtractionResult(BaseModel):
-    raw_transcript: str = Field(default="")
+    # raw_transcript: str = Field(default="")
     patient_info: PatientInfo = Field(default_factory=PatientInfo)
     medications: List[MedicationEntry] = Field(
         default_factory=list,

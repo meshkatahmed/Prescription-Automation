@@ -1,5 +1,6 @@
 from .services.extractor import ExtractionPipeline, BaseExtractor, RegexExtractor, LLMExtractor
 from .schemas import ExtractionResult, MedicationEntry, PatientInfo, SymptomEntry
+from .models import ExtractRequest, ExtractResponse
 from .utils.transcript_utils import parse_transcript, normalize_transcript
 
 __all__ = [
@@ -13,5 +14,7 @@ __all__ = [
     "SymptomEntry",
     "parse_transcript",
     "normalize_transcript",
+    "ExtractRequest",
+    "ExtractResponse"
 ]
 

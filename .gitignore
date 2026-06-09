@@ -3,4 +3,10 @@
 .env
 
 prescription_automation/__pycache__
+prescription_automation/services/__pycache__
+prescription_automation/schemas/__pycache__
+prescription_automation/models/__pycache__
+prescription_automation/prompts/__pycache__
+prescription_automation/api/__pycache__
+prescription_automation/utils/__pycache__
 tests/__pycache__

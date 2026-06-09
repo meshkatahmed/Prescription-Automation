@@ -18,7 +18,8 @@ SPEAKER_PATTERNS = [
 
 def normalize_transcript(raw_text: str) -> str:
     normalized = raw_text.strip()
-    normalized = re.sub(r"\r\n", "\n", normalized)
+    normalized = re.sub(r"\r\n?", "\n", normalized)
+    normalized = re.sub(r"[ \t]+\n", "\n", normalized)
     normalized = re.sub(r"\n{3,}", "\n\n", normalized)
     return normalized
 
