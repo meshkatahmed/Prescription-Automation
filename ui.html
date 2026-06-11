@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prescription Automation</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #eef2f7;
+      color: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      padding: 24px;
+    }
+
+    .app-shell {
+      width: min(100%, 1200px);
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
+      padding: 32px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+      letter-spacing: -0.03em;
+    }
+
+    p.lead {
+      margin: 0 0 24px;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel .card {
+      padding: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 420px;
+      resize: vertical;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid #d1d5db;
+      background: #f8fafc;
+      color: #111827;
+      font: inherit;
+      line-height: 1.6;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      color: white;
+      box-shadow: 0 18px 30px rgba(79, 70, 229, 0.18);
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .status {
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 0.98rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 48px;
+    }
+
+    .result-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 24px;
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      color: #1f2937;
+    }
+
+    .card p,
+    .card li,
+    .card dt,
+    .card dd {
+      margin: 0;
+      color: #475569;
+      line-height: 1.7;
+    }
+
+    dl {
+      display: grid;
+      gap: 12px 16px;
+      grid-template-columns: minmax(110px, max-content) 1fr;
+      align-items: start;
+      margin: 0;
+    }
+
+    dt {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    dd {
+      margin: 0;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 0.9rem;
+    }
+
+    .footer {
+      margin-top: 26px;
+      color: #64748b;
+      font-size: 0.92rem;
+      text-align: center;
+    }
+
+    .error-text {
+      color: #b91c1c;
+    }
+
+    @media (max-width: 980px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+      }
+      .app-shell {
+        padding: 24px;
+      }
+      textarea {
+        min-height: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <h1>Prescription Automation</h1>
+    <p class="lead">Paste your transcript on the left, extract on the right, and compare regex, LLM, and merged output in one clean view.</p>
+
+    <div class="page-grid">
+      <section class="panel">
+        <div class="card">
+          <h2>Transcript</h2>
+          <label for="transcript">Transcript text</label>
+          <textarea id="transcript" placeholder="Paste transcript text here..."></textarea>
+          <div class="button-row">
+            <button id="submitBtn" class="primary">Extract</button>
+            <button id="clearBtn" class="secondary" type="button">Clear</button>
+          </div>
+          <div id="status" class="status">Ready to extract.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div id="results" class="result-grid" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <div class="footer">This is a lightweight frontend demo for the Prescription Automation API.</div>
+  </div>
+
+  <script>
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const transcriptArea = document.getElementById('transcript');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+    const apiUrl = '/extract';
+
+    function formatValue(value) {
+      if (value === undefined || value === null || value === '') return '—';
+      return String(value);
+    }
+
+    function renderInfoSection(record) {
+      const items = [
+        ['Name', record.name],
+        ['Age', record.age],
+        ['Gender', record.gender],
+        ['Weight', record.weight],
+        ['Height', record.height],
+        ['Chief complaint', record.chief_complaint],
+      ].filter(([, value]) => value !== undefined && value !== null && value !== '');
+
+      if (!items.length) {
+        return '<p>No patient info found.</p>';
+      }
+
+      return `<dl>${items.map(([title, value]) => `<dt>${title}</dt><dd>${formatValue(value)}</dd>`).join('')}</dl>`;
+    }
+
+    function renderList(title, items, renderItem) {
+      if (!items || items.length === 0) {
+        return `<p>No ${title.toLowerCase()} found.</p>`;
+      }
+      return `<ul>${items.map(renderItem).join('')}</ul>`;
+    }
+
+    function renderMedicationItem(med) {
+      const fields = [med.dosage, med.frequency, med.route, med.duration, med.instructions]
+        .filter(Boolean)
+        .map(formatValue)
+        .join(' · ');
+      return `<li><strong>${med.name}</strong>${fields ? ` — ${fields}` : ''}</li>`;
+    }
+
+    function renderSymptomItem(symptom) {
+      const details = [symptom.onset, symptom.severity, ...(symptom.descriptors || [])].filter(Boolean).join(' · ');
+      return `<li><strong>${symptom.symptom}</strong>${details ? ` — ${details}` : ''}</li>`;
+    }
+
+    function renderSection(title, htmlContent) {
+      return `
+        <div class="card">
+          <h2>${title}</h2>
+          ${htmlContent}
+        </div>
+      `;
+    }
+
+    function renderExtractionResult(label, data) {
+      const infoHtml = renderInfoSection(data.patient_info || {});
+      const medsHtml = renderList('Medications', data.medications || [], renderMedicationItem);
+      const discontinuedHtml = renderList('Discontinued medications', data.discontinued_medications || [], renderMedicationItem);
+      const symptomsHtml = renderList('Symptoms', data.patient_info?.symptoms || [], renderSymptomItem);
+      const notesHtml = renderList('Clinical notes', data.clinical_notes || [], (note) => `<li>${note}</li>`);
+      const vitalsHtml = renderList('Vital signs', data.patient_info?.vital_signs || [], (item) => `<li>${item}</li>`);
+
+      return `
+        <div class="card">
+          <h2>${label}</h2>
+          <strong>Patient Info</strong>
+          ${infoHtml}
+          <hr style="margin:18px 0;border:none;border-top:1px solid rgba(148, 163, 184, 0.18)">
+          <strong>Medications</strong>
+          ${medsHtml}
+          <strong>Discontinued Medications</strong>
+          ${discontinuedHtml}
+          <strong>Symptoms</strong>
+          ${symptomsHtml}
+          <strong>Clinical Notes</strong>
+          ${notesHtml}
+          <strong>Vital Signs</strong>
+          ${vitalsHtml}
+        </div>
+      `;
+    }
+
+    function normalizeName(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function choosePreferable(regexValue, llmValue) {
+      const regexEmpty = regexValue === undefined || regexValue === null || regexValue === '';
+      const llmEmpty = llmValue === undefined || llmValue === null || llmValue === '';
+      if (regexEmpty) return llmValue || '';
+      if (llmEmpty) return regexValue || '';
+      if (typeof regexValue === 'string' && typeof llmValue === 'string') {
+        if (regexValue.trim() === llmValue.trim()) return regexValue;
+        return regexValue.length >= llmValue.length ? regexValue : llmValue;
+      }
+      return regexValue;
+    }
+
+    function mergeSymptomList(regexSymptoms = [], llmSymptoms = []) {
+      const mergedMap = new Map();
+
+      const add = (item) => {
+        if (!item || !item.symptom) return;
+        const key = normalizeName(item.symptom);
+        const existing = mergedMap.get(key) || {
+          symptom: item.symptom,
+          onset: '',
+          severity: '',
+          descriptors: [],
+        };
+
+        existing.symptom = existing.symptom || item.symptom;
+        existing.onset = choosePreferable(existing.onset, item.onset);
+        existing.severity = choosePreferable(existing.severity, item.severity);
+        existing.descriptors = Array.from(
+          new Set([...(existing.descriptors || []), ...(Array.isArray(item.descriptors) ? item.descriptors : [])].filter(Boolean))
+        );
+        mergedMap.set(key, existing);
+      };
+
+      regexSymptoms.forEach(add);
+      llmSymptoms.forEach(add);
+
+      return Array.from(mergedMap.values());
+    }
+
+    function mergeStringArray(regexArray = [], llmArray = []) {
+      const merged = [];
+      const seen = new Set();
+
+      [...regexArray, ...llmArray].forEach((entry) => {
+        const normalized = normalizeName(entry);
+        if (!normalized) return;
+        if (!seen.has(normalized)) {
+          seen.add(normalized);
+          merged.push(entry);
+        }
+      });
+
+      return merged;
+    }
+
+    function mergePatientInfo(regexInfo = {}, llmInfo = {}) {
+      return {
+        name: choosePreferable(regexInfo.name, llmInfo.name),
+        age: choosePreferable(regexInfo.age, llmInfo.age),
+        gender: choosePreferable(regexInfo.gender, llmInfo.gender),
+        weight: choosePreferable(regexInfo.weight, llmInfo.weight),
+        height: choosePreferable(regexInfo.height, llmInfo.height),
+        chief_complaint: choosePreferable(regexInfo.chief_complaint, llmInfo.chief_complaint),
+        conditions: mergeStringArray(regexInfo.conditions || [], llmInfo.conditions || []),
+        allergies: mergeStringArray(regexInfo.allergies || [], llmInfo.allergies || []),
+        vital_signs: mergeStringArray(regexInfo.vital_signs || [], llmInfo.vital_signs || []),
+        symptoms: mergeSymptomList(regexInfo.symptoms || [], llmInfo.symptoms || []),
+        current_medications: mergeEntries(regexInfo.current_medications || [], llmInfo.current_medications || []),
+      };
+    }
+
+    function mergeEntries(regexItems = [], llmItems = []) {
+      const mergedMap = new Map();
+
+      const addItem = (item) => {
+        if (!item || !item.name) return;
+        const key = normalizeName(item.name);
+        const existing = mergedMap.get(key) || {
+          name: item.name,
+          dosage: '',
+          frequency: '',
+          route: '',
+          duration: '',
+          instructions: '',
+        };
+
+        existing.name = existing.name || item.name;
+        existing.dosage = choosePreferable(existing.dosage, item.dosage);
+        existing.frequency = choosePreferable(existing.frequency, item.frequency);
+        existing.route = choosePreferable(existing.route, item.route);
+        existing.duration = choosePreferable(existing.duration, item.duration);
+        existing.instructions = choosePreferable(existing.instructions, item.instructions);
+
+        mergedMap.set(key, existing);
+      };
+
+      regexItems.forEach(addItem);
+      llmItems.forEach(addItem);
+
+      return Array.from(mergedMap.values());
+    }
+
+    function mergeExtractionData(regex = {}, llm = {}) {
+      const mergedPatientInfo = mergePatientInfo(regex.patient_info || {}, llm.patient_info || {});
+      const mergedMedications = mergeEntries(regex.medications || [], llm.medications || []);
+      const mergedDiscontinued = mergeEntries(regex.discontinued_medications || [], llm.discontinued_medications || []);
+      const mergedNotes = Array.from(new Set([...(regex.clinical_notes || []), ...(llm.clinical_notes || [])].filter(Boolean)));
+
+      return {
+        patient_info: mergedPatientInfo,
+        medications: mergedMedications,
+        discontinued_medications: mergedDiscontinued,
+        clinical_notes: mergedNotes,
+      };
+    }
+
+    function updateStatus(message, isError = false) {
+      statusEl.textContent = message;
+      statusEl.classList.toggle('error-text', isError);
+    }
+
+    function clearResults() {
+      resultsEl.innerHTML = '';
+    }
+
+    async function handleSubmit() {
+      const transcript = transcriptArea.value.trim();
+      if (!transcript) {
+        updateStatus('Please enter a transcript before extracting.', true);
+        return;
+      }
+
+      submitBtn.disabled = true;
+      updateStatus('Sending transcript to the API...');
+      clearResults();
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript }),
+        });
+
+        if (!response.ok) {
+          const body = await response.text();
+          throw new Error(`API request failed: ${response.status} ${response.statusText} - ${body}`);
+        }
+
+        const result = await response.json();
+        const llmData = result.llm || { patient_info: {}, medications: [], discontinued_medications: [], clinical_notes: [] };
+        const mergedData = mergeExtractionData(result.regex, llmData);
+
+        resultsEl.innerHTML = `
+          ${renderExtractionResult('Merged Extraction', mergedData)}
+          ${renderExtractionResult('Regex Extraction', result.regex)}
+          ${renderExtractionResult('LLM Extraction', llmData)}
+        `;
+
+        if (result.llm_error) {
+          updateStatus(`Extraction complete. LLM note: ${result.llm_error}`, true);
+        } else {
+          updateStatus('Extraction complete. Results are shown below.');
+        }
+      } catch (error) {
+        updateStatus(error.message, true);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    clearBtn.addEventListener('click', () => {
+      transcriptArea.value = '';
+      clearResults();
+      updateStatus('Ready to extract.');
+    });
+
+    submitBtn.addEventListener('click', handleSubmit);
+
+    transcriptArea.addEventListener('keydown', (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        event.preventDefault();
+        handleSubmit();
+      }
+    });
+  </script>
+</body>
+</html>

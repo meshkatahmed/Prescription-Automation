@@ -5,8 +5,10 @@ from dotenv import load_dotenv
 from typing import Optional
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 
 from prescription_automation import ExtractRequest,ExtractResponse,ExtractionResult,ExtractionPipeline
+from prescription_automation.ui import get_ui_html
 
 load_dotenv()
 
@@ -15,6 +17,11 @@ app = FastAPI(
     version='0.1.0',
     description='Extract medical information from transcript text using regex and LLM extractors separately.',
 )
+
+
+@app.get("/", response_class=HTMLResponse)
+def ui() -> HTMLResponse:
+    return HTMLResponse(content=get_ui_html(), status_code=200)
 
 @app.post('/extract', response_model=ExtractResponse)
 def extract(request: ExtractRequest) -> ExtractResponse:
@@ -38,3 +45,5 @@ def extract(request: ExtractRequest) -> ExtractResponse:
             llm_error = str(exc)
 
     return ExtractResponse(regex=regex_result, llm=llm_result, llm_error=llm_error)
+
+

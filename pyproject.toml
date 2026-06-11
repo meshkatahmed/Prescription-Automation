@@ -18,7 +18,8 @@ packages = [
 ]
 
 include = [
-    { path = "prescription_automation/prompts/extraction_prompt.txt", format = "text" }
+    { path = "prescription_automation/prompts/extraction_prompt.txt", format = "text" },
+    { path = "ui.html", format = "text" }
 ]
 
 [project.optional-dependencies]
